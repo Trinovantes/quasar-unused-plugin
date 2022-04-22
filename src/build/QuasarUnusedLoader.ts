@@ -1,4 +1,4 @@
-import { PLUGIN_NAME } from '../Constants'
+import { PLUGIN_NAME, QUASAR_INDEX_FILE } from '../Constants'
 import type { LoaderContext } from 'webpack'
 import type { QuasarUnusedLoaderOptions } from './QuasarUnusedLoaderOptions'
 
@@ -9,7 +9,7 @@ export function QuasarUnusedLoader(this: LoaderContext<QuasarUnusedLoaderOptions
 
     const match = /\{\s*components/.exec(source)
     if (!match) {
-        logger.warn('Failed to rewrite quasar')
+        logger.warn(`Failed to rewrite ${QUASAR_INDEX_FILE}`)
         return source
     }
 
