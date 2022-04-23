@@ -1,3 +1,3 @@
-import { QuasarUnusedLoader } from './build/QuasarUnusedLoader'
+import { QuasarUnusedLoader } from './webpack/QuasarUnusedLoader'
 
 export default QuasarUnusedLoader

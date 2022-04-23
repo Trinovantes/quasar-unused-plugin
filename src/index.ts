@@ -1,2 +1,2 @@
-export * from './build/QuasarUnusedPlugin'
-export * from './build/QuasarUnusedPluginOptions'
+export * from './webpack/QuasarUnusedPlugin'
+export * from './webpack/QuasarUnusedPluginOptions'
