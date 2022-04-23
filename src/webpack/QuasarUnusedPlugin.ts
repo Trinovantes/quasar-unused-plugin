@@ -30,6 +30,11 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
     }
 
     apply(compiler: Compiler) {
+        // Don't run in dev mode since tree-shaking is disabled anyways
+        if (compiler.options.mode === 'development') {
+            return
+        }
+
         this.#replaceQuasarMacros(compiler)
         this.#findUsedComponents(compiler)
         this.#rewriteQuasarModule(compiler)
