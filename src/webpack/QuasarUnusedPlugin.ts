@@ -30,13 +30,19 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
     }
 
     apply(compiler: Compiler) {
+        this.#replaceQuasarMacros(compiler)
+
         // Don't run in dev mode since tree-shaking is disabled anyways
         if (compiler.options.mode === 'development') {
             return
         }
 
-        this.#replaceQuasarMacros(compiler)
         this.#findUsedComponents(compiler)
+
+        if (this.#options.skipQuasarRewrite) {
+            return
+        }
+
         this.#rewriteQuasarModule(compiler)
     }
 
@@ -120,10 +126,6 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
     }
 
     #rewriteQuasarModule(compiler: Compiler) {
-        if (this.#options.skipQuasarRewrite) {
-            return
-        }
-
         const logger = compiler.getInfrastructureLogger(PLUGIN_NAME)
         let isFirstPass = true
         let modifiedQuasar = false
