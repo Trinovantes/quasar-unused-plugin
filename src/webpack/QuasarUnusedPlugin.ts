@@ -7,8 +7,8 @@ import path from 'path'
 import { existsSync } from 'fs'
 import type { QuasarUnusedLoaderOptions } from './QuasarUnusedLoaderOptions'
 import type { QuasarUnusedPluginOptions } from './QuasarUnusedPluginOptions'
-import { findCallExpression } from '../utils/findExpressionNode'
 import { findImportLocalId } from '../utils/findImportLocalId'
+import { findCallExpressions } from '../utils/findCallExpressions'
 
 interface QuasarAutoImport {
     importName: Record<string, string>
@@ -96,26 +96,24 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
                         return
                     }
 
-                    const callExpr = findCallExpression(ast, resolveComponentLocalId)
-                    if (!callExpr) {
-                        return
-                    }
+                    const callExprs = findCallExpressions(ast, resolveComponentLocalId)
+                    for (const callExpr of callExprs) {
+                        if (callExpr.arguments[0].type !== 'Literal') {
+                            continue
+                        }
 
-                    if (callExpr.arguments[0].type !== 'Literal') {
-                        return
-                    }
+                        const componentName = callExpr.arguments[0].raw?.replace(/['"]+/g, '') ?? ''
+                        if (!componentRegex.test(componentName)) {
+                            continue
+                        }
 
-                    const componentName = callExpr.arguments[0].raw?.replace(/['"]+/g, '') ?? ''
-                    if (!componentRegex.test(componentName)) {
-                        return
-                    }
+                        const canonicalName = quasarAutoImport.importName[componentName]
+                        if (!canonicalName) {
+                            continue
+                        }
 
-                    const canonicalName = quasarAutoImport.importName[componentName]
-                    if (!canonicalName) {
-                        return
+                        this.#usedComponents.add(canonicalName)
                     }
-
-                    this.#usedComponents.add(canonicalName)
                 })
             }
 

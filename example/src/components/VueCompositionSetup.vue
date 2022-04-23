@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, defineProps } from 'vue'
+import { computed, defineProps, ref } from 'vue'
 import Counter from './Counter.vue'
 
 const props = defineProps({
@@ -11,6 +11,7 @@ const props = defineProps({
 
 const name = computed(() => `Composition Setup num:${props.num}`)
 const childNum = computed(() => props.num + 1)
+const message = ref<string | null>(null)
 </script>
 
 <template>
@@ -23,9 +24,23 @@ const childNum = computed(() => props.num + 1)
             v-if="num < 5"
             :num="childNum"
         />
-        <Counter
+        <template
             v-else
-        />
+        >
+            <q-form>
+                <q-input
+                    v-model="message"
+                    label="Message"
+                    debounce="250"
+                    outlined
+                    clearable
+                    :rules="[ (val: string) => val && val.length > 0 || 'Message cannot be empty']"
+                    hide-bottom-space
+                />
+            </q-form>
+
+            <Counter />
+        </template>
     </article>
 </template>
 
