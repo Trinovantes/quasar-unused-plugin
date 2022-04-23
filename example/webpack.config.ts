@@ -6,8 +6,8 @@ import nodeExternals from 'webpack-node-externals'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import { VueSsrAssetsClientPlugin, VueSsrAssetsServerPlugin } from 'vue-ssr-assets-plugin'
-import { QuasarUnusedPlugin } from '../src/build/QuasarUnusedPlugin'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import { QuasarUnusedPlugin } from '../src'
 
 // ----------------------------------------------------------------------------
 // Constants
