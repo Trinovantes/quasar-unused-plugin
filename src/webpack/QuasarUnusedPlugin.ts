@@ -29,6 +29,24 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
         this.#options = options
     }
 
+    /**
+     * 1. First pass (readonly, disable emits)
+     *      - Read input files (not in node_modules)
+     *      - Parse input files into AST
+     *      - Traverse AST and find Identifier nodes with names that match Quasar component name regex
+     *
+     * 2. Second pass
+     *      - Append loader to node_modules/quasar/src/index.all
+     *      - Modify node_modules/quasar/src/index.all based on names from first pass
+     *      - Run terser and other optimizations like tree shaking
+     *
+     * Why rewrite quasar/src/index.all instead of modifying the Component.vue?vue&type=template files directly with a loader like the official CLI tools?
+     * - That would be idea as then we wouldn't need multiple passes
+     * - However
+     *      Quasar also needs to call installQuasar() from src/install-quasar to initialize the library
+     *      This file/function does not have TypeScript definitions and is not exported making it infeasible
+     *      As a result, we have to call the generic exported Vue wrapper from quasar/src/index.all
+     */
     apply(compiler: Compiler) {
         this.#replaceQuasarMacros(compiler)
 
