@@ -1,10 +1,10 @@
-import type estree from 'estree'
+import type { Node } from 'estree'
 import { isEstreeNode } from './isEstreeNode'
 
-export function stringifyEstree(root: estree.Node): string {
+export function stringifyEstree(root: Node): string {
     let str = ''
 
-    const stringify = (node: estree.Node, depth = 0) => {
+    const stringify = (node: Node, depth = 0) => {
         str += ' '.repeat(depth * 2)
         str += node.type
 
@@ -42,7 +42,7 @@ export function stringifyEstree(root: estree.Node): string {
             }
 
             if (Array.isArray(value)) {
-                const childNodes: Array<estree.Node> = []
+                const childNodes: Array<Node> = []
 
                 for (const el of value) {
                     if (isEstreeNode(el)) {

@@ -1,7 +1,5 @@
 import { WebpackPluginInstance, Compiler, javascript, NormalModule, Compilation } from 'webpack'
 import { PLUGIN_NAME, QUASAR_INDEX_FILE, QUASAR_SIDE_EFFECTS } from '../Constants'
-import { walk } from 'estree-walker'
-import type { CallExpression, ImportDeclaration } from 'estree'
 import quasarAutoImportJson from 'quasar/dist/transforms/auto-import.json'
 import { ReplaceValueDependency } from './ReplaceValueDependency'
 import quasarJson from 'quasar/package.json'
@@ -9,6 +7,8 @@ import path from 'path'
 import { existsSync } from 'fs'
 import type { QuasarUnusedLoaderOptions } from './QuasarUnusedLoaderOptions'
 import type { QuasarUnusedPluginOptions } from './QuasarUnusedPluginOptions'
+import { findCallExpression } from '../utils/findExpressionNode'
+import { findImportLocalId } from '../utils/findImportLocalId'
 
 interface QuasarAutoImport {
     importName: Record<string, string>
@@ -80,65 +80,31 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
                         return
                     }
 
-                    let resolveComponentLocalId: string | undefined
-
-                    walk(ast, {
-                        enter: (n) => {
-                            if (n.type !== 'ImportDeclaration') {
-                                return
-                            }
-
-                            const node = n as ImportDeclaration
-                            if (node.source.value !== 'vue') {
-                                return
-                            }
-
-                            for (const specifier of node.specifiers) {
-                                if (specifier.type !== 'ImportSpecifier') {
-                                    continue
-                                }
-
-                                if (specifier.imported.name !== 'resolveComponent') {
-                                    continue
-                                }
-
-                                resolveComponentLocalId = specifier.local.name
-                            }
-                        },
-                    })
-
+                    const resolveComponentLocalId = findImportLocalId(ast, 'vue', 'resolveComponent')
                     if (!resolveComponentLocalId) {
                         return
                     }
 
-                    walk(ast, {
-                        enter: (n) => {
-                            if (n.type !== 'CallExpression') {
-                                return
-                            }
+                    const callExpr = findCallExpression(ast, resolveComponentLocalId)
+                    if (!callExpr) {
+                        return
+                    }
 
-                            const node = n as CallExpression
-                            if (!(node.callee.type === 'Identifier' && node.callee.name === resolveComponentLocalId)) {
-                                return
-                            }
+                    if (callExpr.arguments[0].type !== 'Literal') {
+                        return
+                    }
 
-                            if (node.arguments[0].type !== 'Literal') {
-                                return
-                            }
+                    const componentName = callExpr.arguments[0].raw?.replace(/['"]+/g, '') ?? ''
+                    if (!componentRegex.test(componentName)) {
+                        return
+                    }
 
-                            const componentName = node.arguments[0].raw?.replace(/['"]+/g, '') ?? ''
-                            if (!componentRegex.test(componentName)) {
-                                return
-                            }
+                    const canonicalName = quasarAutoImport.importName[componentName]
+                    if (!canonicalName) {
+                        return
+                    }
 
-                            const canonicalName = quasarAutoImport.importName[componentName]
-                            if (!canonicalName) {
-                                return
-                            }
-
-                            this.#usedComponents.add(canonicalName)
-                        },
-                    })
+                    this.#usedComponents.add(canonicalName)
                 })
             }
 

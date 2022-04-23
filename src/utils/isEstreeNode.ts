@@ -1,6 +1,6 @@
-import type estree from 'estree'
+import type { Node } from 'estree'
 
-export function isEstreeNode(value: unknown): value is estree.Node {
+export function isEstreeNode(value: unknown): value is Node {
     if (value === null || value === undefined) {
         return false
     }
