@@ -29,3 +29,19 @@ declare module 'quasar/src/index.all' {
     export * from 'quasar'
 }
 ```
+
+If you are externalizing node modules, you need to allowlist quasar
+
+```ts
+import nodeExternals from 'webpack-node-externals'
+
+export default {
+    externals: [
+        nodeExternals({
+            allowlist: [
+                /^quasar*/,
+            ],
+        }),
+    ],
+}
+```
