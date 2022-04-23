@@ -126,7 +126,6 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
     #rewriteQuasarModule(compiler: Compiler) {
         const logger = compiler.getInfrastructureLogger(PLUGIN_NAME)
         let isFirstPass = true
-        let modifiedQuasar = false
 
         compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
             // Need one complete compilation pass to be able to parse all source files for references to quasar components
@@ -135,10 +134,6 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
                     logger.info(`Found ${this.#usedComponents.size} Quasar component(s) being used`, [...this.#usedComponents])
                     isFirstPass = false
                     return true
-                }
-
-                if (!modifiedQuasar) {
-                    logger.warn(`Did not find Quasar module to rewrite. Did you import from "${QUASAR_INDEX_FILE}"?`)
                 }
 
                 return false
@@ -191,8 +186,6 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
                     ident: null,
                     type: null,
                 })
-
-                modifiedQuasar = true
             })
         })
     }
