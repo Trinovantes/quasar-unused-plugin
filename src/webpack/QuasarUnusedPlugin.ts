@@ -120,6 +120,10 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
     }
 
     #rewriteQuasarModule(compiler: Compiler) {
+        if (this.#options.skipQuasarRewrite) {
+            return
+        }
+
         const logger = compiler.getInfrastructureLogger(PLUGIN_NAME)
         let isFirstPass = true
         let modifiedQuasar = false
