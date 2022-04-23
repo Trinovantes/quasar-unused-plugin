@@ -3,7 +3,7 @@ import { defineComponent, computed, defineAsyncComponent } from 'vue'
 
 export default defineComponent({
     components: {
-        Counter: defineAsyncComponent(() => import('./Counter.vue')),
+        SimpleCounter: defineAsyncComponent(() => import('./SimpleCounter.vue')),
     },
 
     props: {
@@ -35,7 +35,7 @@ export default defineComponent({
             v-if="num < 5"
             :num="childNum"
         />
-        <Counter
+        <SimpleCounter
             v-else
         />
     </article>

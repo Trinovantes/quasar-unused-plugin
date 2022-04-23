@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Counter from './Counter.vue'
+import SimpleCounter from './SimpleCounter.vue'
 </script>
 
 <template>
@@ -8,6 +8,6 @@ import Counter from './Counter.vue'
             HomePage
         </h1>
 
-        <Counter />
+        <SimpleCounter />
     </article>
 </template>

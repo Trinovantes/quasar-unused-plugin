@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, defineProps, ref } from 'vue'
-import Counter from './Counter.vue'
+import SimpleCounter from './SimpleCounter.vue'
 
 const props = defineProps({
     num: {
@@ -39,7 +39,7 @@ const message = ref<string | null>(null)
                 />
             </q-form>
 
-            <Counter />
+            <SimpleCounter />
         </template>
     </article>
 </template>
