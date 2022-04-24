@@ -56,11 +56,6 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
         }
 
         this.#findUsedComponents(compiler)
-
-        if (this.#options.skipQuasarRewrite) {
-            return
-        }
-
         this.#rewriteQuasarModule(compiler)
     }
 
