@@ -39,6 +39,7 @@ const validator = ajv.compile({
 export function validateQuasarUnusedPluginOptions(options: unknown): options is Required<QuasarUnusedPluginOptions> {
     const isValid = validator(options)
     if (!isValid) {
+        console.warn('Invalid QuasarUnusedPluginOptions', validator.errors)
         throw new Error('Invalid QuasarUnusedPluginOptions')
     }
 
