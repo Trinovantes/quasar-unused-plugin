@@ -55,7 +55,9 @@ const commonConfig: Configuration = {
             'DEFINE.MANIFEST_FILE': JSON.stringify(manifestFile),
         }),
         new VueLoaderPlugin(),
-        new QuasarUnusedPlugin(),
+        new QuasarUnusedPlugin({
+            enableSsr: true,
+        }),
     ],
 
     module: {
