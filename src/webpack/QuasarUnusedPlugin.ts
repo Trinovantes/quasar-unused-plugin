@@ -19,6 +19,12 @@ interface QuasarAutoImport {
     }
 }
 
+enum CompilationPass {
+    FIND_COMPONENTS,
+    MODIFY_QUASAR,
+    NUM_PASSES,
+}
+
 const quasarAutoImport = quasarAutoImportJson as QuasarAutoImport
 const componentRegex = new RegExp(quasarAutoImport.regex.components)
 
@@ -140,18 +146,29 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
 
     #rewriteQuasarModule(compiler: Compiler) {
         const logger = compiler.getInfrastructureLogger(PLUGIN_NAME)
-        let isFirstPass = true
+
+        let passCount = 0
+        let hasModifiedQuasar = false
+
+        compiler.hooks.done.tap(PLUGIN_NAME, (stats) => {
+            if (stats.compilation.needAdditionalPass) {
+                return
+            }
+
+            assert(passCount === CompilationPass.NUM_PASSES)
+
+            logger.info(`Found ${this.#usedComponents.size} Quasar component(s) being used`, [...this.#usedComponents])
+
+            if (!hasModifiedQuasar) {
+                logger.warn(`Did not rewrite quasar. Did you import "${QUASAR_INDEX_FILE}"?`)
+            }
+        })
 
         compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
             // Need one complete compilation pass to be able to parse all source files for references to quasar components
             compilation.hooks.needAdditionalPass.tap(PLUGIN_NAME, () => {
-                if (isFirstPass) {
-                    logger.info(`Found ${this.#usedComponents.size} Quasar component(s) being used`, [...this.#usedComponents])
-                    isFirstPass = false
-                    return true
-                }
-
-                return false
+                passCount += 1
+                return passCount < CompilationPass.NUM_PASSES
             })
 
             // Disable assets for first pass since we need to first parse all assets for references to quasar components
@@ -159,12 +176,10 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
                 name: PLUGIN_NAME,
                 stage: Compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS,
             }, () => {
-                if (!isFirstPass) {
-                    return
-                }
-
-                for (const asset of Object.keys(compilation.assets)) {
-                    compilation.deleteAsset(asset)
+                if (passCount < CompilationPass.MODIFY_QUASAR) {
+                    for (const asset of Object.keys(compilation.assets)) {
+                        compilation.deleteAsset(asset)
+                    }
                 }
             })
 
@@ -175,9 +190,11 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
                     return
                 }
 
-                if (isFirstPass) {
+                if (passCount < CompilationPass.MODIFY_QUASAR) {
                     return
                 }
+
+                hasModifiedQuasar = true
 
                 const packageJson = normalModule.resourceResolveData?.descriptionFileData as Record<string, unknown>
                 packageJson.sideEffects = this.#options.sideEffectsOverride
