@@ -126,7 +126,7 @@ const clientEntryConfig = merge(commonConfig, {
     plugins: [
         new BundleAnalyzerPlugin({
             analyzerMode: 'disabled',
-            generateStatsFile: !isDev,
+            generateStatsFile: false,
         }),
         new CopyWebpackPlugin({
             patterns: [
