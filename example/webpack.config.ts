@@ -182,7 +182,6 @@ const serverEntryConfig = merge(commonConfig, {
             // Do not externalize dependencies that need to be processed by webpack.
             // You should also whitelist deps that modify `global` (e.g. polyfills)
             allowlist: [
-                /^vue*/,
                 /^quasar*/,
                 /\.(css|sass|scss)$/,
                 /\.(vue)$/,
