@@ -1,5 +1,5 @@
-import type { Node } from 'estree'
 import { isEstreeNode } from './isEstreeNode'
+import type { Node } from 'estree'
 
 export function visitChildren<T>(node: Node, visitNode: (node: Node) => T | undefined): T | undefined {
     for (const value of Object.values(node)) {

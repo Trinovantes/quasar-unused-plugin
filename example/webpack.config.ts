@@ -1,12 +1,12 @@
 import path from 'path'
-import { Configuration, DefinePlugin } from 'webpack'
-import { VueLoaderPlugin } from 'vue-loader'
-import merge from 'webpack-merge'
-import nodeExternals from 'webpack-node-externals'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import { VueLoaderPlugin } from 'vue-loader'
 import { VueSsrAssetsClientPlugin, VueSsrAssetsServerPlugin } from 'vue-ssr-assets-plugin'
+import { Configuration, DefinePlugin } from 'webpack'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import merge from 'webpack-merge'
+import nodeExternals from 'webpack-node-externals'
 import { QuasarUnusedPlugin } from '../src'
 
 // ----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
-import { PLUGIN_NAME } from '../Constants'
 import { Dependency, javascript, Generator, sources } from 'webpack'
+import { PLUGIN_NAME } from '../Constants'
 
 type DependencyTemplate = ReturnType<Parameters<Generator['generate']>[1]['dependencyTemplates']['get']>
 type Expression = Parameters<javascript.JavascriptParser['evaluateExpression']>[0]

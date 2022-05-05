@@ -1,5 +1,5 @@
-import type { ImportDefaultSpecifier, ImportSpecifier, Node } from 'estree'
 import { visitChildren } from './visitChildren'
+import type { ImportDefaultSpecifier, ImportSpecifier, Node } from 'estree'
 
 export function findImportLocalId(root: Node, importSource: string, importName: string): string | undefined {
     const search = (node: Node): ImportSpecifier | ImportDefaultSpecifier | undefined => {

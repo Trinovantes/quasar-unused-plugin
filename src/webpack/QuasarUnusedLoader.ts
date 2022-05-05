@@ -1,6 +1,6 @@
 import { PLUGIN_NAME, QUASAR_INDEX_FILE } from '../Constants'
-import type { LoaderContext } from 'webpack'
 import type { QuasarUnusedLoaderOptions } from './QuasarUnusedLoaderOptions'
+import type { LoaderContext } from 'webpack'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export function QuasarUnusedLoader(this: LoaderContext<QuasarUnusedLoaderOptions>, source: string): string {

@@ -1,11 +1,11 @@
+import { useSSRContext } from '@vue/runtime-core'
+import { Quasar } from 'quasar/src/index.all'
 import { createSSRApp } from 'vue'
 import App from './components/App.vue'
 import { createAppRouter } from './router'
-import type { createRouter } from 'vue-router'
 import type { SSRContext } from '@vue/server-renderer'
-import { useSSRContext } from '@vue/runtime-core'
 import type express from 'express'
-import { Quasar } from 'quasar/src/index.all'
+import type { createRouter } from 'vue-router'
 
 interface CreatedApp {
     app: ReturnType<typeof createSSRApp>
