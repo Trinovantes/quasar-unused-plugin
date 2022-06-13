@@ -1,10 +1,8 @@
-import { useSSRContext } from '@vue/runtime-core'
 import { Quasar } from 'quasar/src/index.all'
 import { createSSRApp } from 'vue'
 import App from './components/App.vue'
 import { createAppRouter } from './router'
-import type { SSRContext } from '@vue/server-renderer'
-import type express from 'express'
+import type { AppContext } from './AppContext'
 import type { createRouter } from 'vue-router'
 
 interface CreatedApp {
@@ -12,23 +10,7 @@ interface CreatedApp {
     router: ReturnType<typeof createRouter>
 }
 
-export type AppContext = SSRContext & {
-    url: string
-    teleports: Record<string, string>
-    _matchedComponents: Set<string>
-
-    // Required by Quasar
-    req: express.Request
-    res: express.Response
-    _modules: Set<unknown>
-    _meta: Record<string, unknown>
-}
-
-export function useAppContext(): AppContext | undefined {
-    return useSSRContext()
-}
-
-export async function createApp(ssrContext?: AppContext): Promise<CreatedApp> {
+export async function createVueApp(ssrContext?: AppContext): Promise<CreatedApp> {
     // Vue
     const app = createSSRApp(App)
 

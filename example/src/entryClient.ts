@@ -1,8 +1,8 @@
 import 'quasar/dist/quasar.prod.css'
-import { createApp } from './app'
+import { createVueApp } from './createVueApp'
 
 async function main() {
-    const { app } = await createApp()
+    const { app } = await createVueApp()
     app.mount('#app')
 }
 

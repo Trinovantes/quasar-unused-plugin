@@ -4,7 +4,8 @@ import path from 'path'
 import { renderToString } from '@vue/server-renderer'
 import express from 'express'
 import { VueSsrAssetRenderer } from 'vue-ssr-assets-plugin'
-import { AppContext, createApp } from './app'
+import { createVueApp } from './createVueApp'
+import type { AppContext } from './AppContext'
 
 // -----------------------------------------------------------------------------
 // Express
@@ -40,7 +41,7 @@ function createVueHandler() {
 
     return createAsyncHandler(async(req, res) => {
         const targetUrl = req.originalUrl
-        const ssrContext: AppContext = {
+        const appContext: AppContext = {
             url: targetUrl,
             teleports: {},
             _matchedComponents: new Set<string>(),
@@ -51,36 +52,35 @@ function createVueHandler() {
             _meta: {},
         }
 
-        const { app, router } = await createApp(ssrContext)
+        const { app, router } = await createVueApp(appContext)
         if (router.currentRoute.value.fullPath !== targetUrl) {
             res.redirect(router.currentRoute.value.fullPath)
             return
         }
 
         // Render the app on the server
-        const appHtml = await renderToString(app, ssrContext)
-        const { header, footer } = assetRenderer.renderAssets(ssrContext._matchedComponents)
+        const appHtml = await renderToString(app, appContext)
+        const { header, footer } = assetRenderer.renderAssets(appContext._matchedComponents)
 
         console.info()
         console.info('manifest', assetRenderer.manifest)
-        console.info('matchedComponents', ssrContext._matchedComponents)
+        console.info('matchedComponents', appContext._matchedComponents)
 
         res.setHeader('Content-Type', 'text/html')
         res.status(200)
         res.send(`
-            <!DOCTYPE html ${ssrContext.teleports.htmlAttrs ?? ''}>
-            <html lang="en">
-            <head ${ssrContext.teleports.headAttrs ?? ''}>
+            <!DOCTYPE html>
+            <html ${appContext._meta.htmlAttrs ?? ''}>
+            <head>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <link rel="icon" type="image/x-icon" href="/favicon.ico">
                 <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
                 ${header}
-                ${ssrContext.teleports.head ?? ''}
+                ${appContext.teleports?.head ?? ''}
             </head>
-            <body ${ssrContext.teleports.bodyAttrs ?? ''}>
+            <body ${appContext._meta.bodyAttrs ?? ''} class="${appContext._meta.bodyClasses ?? ''}">
                 <div id="app">${appHtml}</div>
-                ${ssrContext.teleports.body ?? ''}
                 ${footer}
             </body>
             </html>
