@@ -1,5 +1,5 @@
-import { QUASAR_SIDE_EFFECTS } from '../src/Constants'
-import { QuasarUnusedPluginOptions, validateQuasarUnusedPluginOptions } from '../src/webpack/QuasarUnusedPluginOptions'
+import { QUASAR_SIDE_EFFECTS } from '@/Constants'
+import { QuasarUnusedPluginOptions, validateQuasarUnusedPluginOptions } from '@/webpack/QuasarUnusedPluginOptions'
 
 describe('QuasarUnusedPluginOptions', () => {
     test('no options', () => {
