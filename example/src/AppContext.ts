@@ -1,7 +1,7 @@
 import type { SSRContext } from '@vue/server-renderer'
 import type express from 'express'
 
-interface QuasarSsrContext {
+type QuasarSsrContext = {
     req: express.Request
     res: express.Response
     _modules: Set<unknown>

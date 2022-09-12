@@ -11,7 +11,7 @@ import { QuasarUnusedPluginOptions, validateQuasarUnusedPluginOptions } from './
 import { ReplaceValueDependency } from './ReplaceValueDependency'
 import type { QuasarUnusedLoaderOptions } from './QuasarUnusedLoaderOptions'
 
-interface QuasarAutoImport {
+type QuasarAutoImport = {
     importName: Record<string, string>
     regex: {
         components: string

@@ -1,7 +1,7 @@
 import Ajv from 'ajv'
 import { QUASAR_SIDE_EFFECTS } from '../Constants'
 
-export interface QuasarUnusedPluginOptions {
+export type QuasarUnusedPluginOptions = {
     sideEffectsOverride?: boolean | Array<string>
     enableSsr?: boolean
     enablePwa?: boolean

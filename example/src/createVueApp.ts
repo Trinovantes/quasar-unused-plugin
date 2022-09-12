@@ -5,12 +5,12 @@ import { createAppRouter } from './router'
 import type { AppContext } from './AppContext'
 import type { createRouter } from 'vue-router'
 
-interface CreatedApp {
+type VueApp = {
     app: ReturnType<typeof createSSRApp>
     router: ReturnType<typeof createRouter>
 }
 
-export async function createVueApp(ssrContext?: AppContext): Promise<CreatedApp> {
+export async function createVueApp(ssrContext?: AppContext): Promise<VueApp> {
     // Vue
     const app = createSSRApp(App)
 

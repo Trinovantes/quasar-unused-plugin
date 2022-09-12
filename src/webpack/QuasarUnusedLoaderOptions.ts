@@ -1,3 +1,3 @@
-export interface QuasarUnusedLoaderOptions {
+export type QuasarUnusedLoaderOptions = {
     usedComponents: Array<string>
 }
