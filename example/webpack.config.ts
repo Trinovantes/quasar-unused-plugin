@@ -6,7 +6,6 @@ import { VueSsrAssetsClientPlugin, VueSsrAssetsServerPlugin } from 'vue-ssr-asse
 import { Configuration, DefinePlugin } from 'webpack'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import merge from 'webpack-merge'
-import nodeExternals from 'webpack-node-externals'
 import { QuasarUnusedPlugin } from '../src'
 
 // ----------------------------------------------------------------------------
@@ -178,16 +177,7 @@ const serverEntryConfig = merge(commonConfig, {
     ],
 
     externals: [
-        nodeExternals({
-            // Do not externalize dependencies that need to be processed by webpack.
-            // You should also whitelist deps that modify `global` (e.g. polyfills)
-            allowlist: [
-                /^quasar*/,
-                /\.(css|sass|scss)$/,
-                /\.(vue)$/,
-                /\.(html)$/,
-            ],
-        }),
+        'express',
     ],
 })
 

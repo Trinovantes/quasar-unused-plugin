@@ -1,8 +1,9 @@
 export const PLUGIN_NAME = 'QuasarUnused'
 
-export const QUASAR_INDEX_FILE = 'quasar/src/index.all'
+export const QUASAR_INDEX_FILE = 'quasar/src/index.prod.js'
 
 export const QUASAR_SIDE_EFFECTS = [
+    '*.css',
     './src/utils',
     './src/plugins',
 ]

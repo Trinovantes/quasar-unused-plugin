@@ -38,33 +38,27 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
     }
 
     /**
-     * 1. First pass (readonly, disable emits)
-     *      - Read input files (not in node_modules)
-     *      - Parse input files into AST
-     *      - Traverse AST and find Identifier nodes with names that match Quasar component name regex
+     * 1. First pass (readonly, all emits later deleted)
+     *      - Parse user js files into AST and find Identifier nodes with names that match Quasar component name regex
+     *      - Replace imports of 'quasar' with 'quasar/src/index.prod.js'
      *
      * 2. Second pass
-     *      - Append loader to node_modules/quasar/src/index.all
-     *      - Modify node_modules/quasar/src/index.all based on names from first pass
+     *      - Append loader to node_modules/quasar/src/index.prod.js
+     *      - Modify node_modules/quasar/src/index.prod.js based on names from first pass
      *      - Run terser and other optimizations like tree shaking
      *
-     * Why rewrite quasar/src/index.all instead of modifying the Component.vue?vue&type=template files directly with a loader like the official CLI tools?
+     * Why rewrite quasar/src/index.prod.js instead of modifying the Component.vue?vue&type=template files directly with a loader like the official CLI tools?
      * - That would be idea as then we wouldn't need multiple passes
      * - However
      *      Quasar also needs to call installQuasar() from src/install-quasar to initialize the library
      *      This file/function does not have TypeScript definitions and is not exported making it infeasible
-     *      As a result, we have to call the generic exported Vue wrapper from quasar/src/index.all
+     *      As a result, we have to call the generic exported Vue wrapper from quasar/src/index.prod.js
      */
     apply(compiler: Compiler) {
         this.#replaceQuasarMacros(compiler)
-
-        // Don't run in dev mode since tree-shaking is disabled anyways
-        if (compiler.options.mode === 'development') {
-            return
-        }
-
         this.#findUsedComponents(compiler)
-        this.#rewriteQuasarModule(compiler)
+        this.#rewriteQuasarImport(compiler)
+        this.#modifyQuasarModule(compiler)
     }
 
     #replaceQuasarMacros(compiler: Compiler) {
@@ -142,41 +136,75 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
             normalModuleFactory.hooks.parser.for('javascript/dynamic').tap(PLUGIN_NAME, onParserCreated)
             normalModuleFactory.hooks.parser.for('javascript/esm').tap(PLUGIN_NAME, onParserCreated)
         })
-    }
 
-    #rewriteQuasarModule(compiler: Compiler) {
-        const logger = compiler.getInfrastructureLogger(PLUGIN_NAME)
-
-        let passCount = 0
-        let hasModifiedQuasar = false
-
-        compiler.hooks.done.tap(PLUGIN_NAME, (stats) => {
-            if (stats.compilation.needAdditionalPass) {
+        let printed = false
+        compiler.hooks.afterCompile.tap(PLUGIN_NAME, () => {
+            if (compiler.options.target !== 'web') {
                 return
             }
 
-            assert(passCount === CompilationPass.NUM_PASSES)
-
-            logger.info(`Found ${this.#usedComponents.size} Quasar component(s) being used`, [...this.#usedComponents])
-
-            if (!hasModifiedQuasar) {
-                logger.warn(`Did not rewrite quasar. Did you import "${QUASAR_INDEX_FILE}"?`)
+            if (printed) {
+                return
             }
+
+            const logger = compiler.getInfrastructureLogger(PLUGIN_NAME)
+            logger.info(`Found ${this.#usedComponents.size} Quasar component(s) being used`, [...this.#usedComponents])
+            printed = true
+        })
+    }
+
+    #rewriteQuasarImport(compiler: Compiler) {
+        const loaderFile = path.join(__dirname, 'QuasarImportLoader')
+        const loaderExt = existsSync(`${loaderFile}.ts`) ? 'ts' : 'js'
+        const loader = `${loaderFile}.${loaderExt}`
+
+        compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
+            NormalModule.getCompilationHooks(compilation).beforeLoaders.tap(PLUGIN_NAME, (loaderItems, normalModule) => {
+                const request = normalModule.request
+                const isJsFile = /\.[c|m]?[t|j]s$/.test(request)
+                const isVueScriptFile = /\.vue\?vue&type=script/.test(request)
+
+                if (!isJsFile && !isVueScriptFile) {
+                    return
+                }
+
+                // Only use loader once per module
+                if (loaderItems.find((loaderItem) => loaderItem.loader === loader)) {
+                    return
+                }
+
+                loaderItems.push({
+                    loader,
+                    options: null,
+                    ident: null,
+                    type: null,
+                })
+            })
+        })
+    }
+
+    #modifyQuasarModule(compiler: Compiler) {
+        const loaderFile = path.join(__dirname, 'QuasarUnusedLoader')
+        const loaderExt = existsSync(`${loaderFile}.ts`) ? 'ts' : 'js'
+        const loader = `${loaderFile}.${loaderExt}`
+
+        // Track compilation passes
+        let currentPass = -1
+        compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
+            currentPass += 1
+
+            compilation.hooks.needAdditionalPass.tap(PLUGIN_NAME, () => {
+                return currentPass < CompilationPass.NUM_PASSES
+            })
         })
 
         compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
-            // Need one complete compilation pass to be able to parse all source files for references to quasar components
-            compilation.hooks.needAdditionalPass.tap(PLUGIN_NAME, () => {
-                passCount += 1
-                return passCount < CompilationPass.NUM_PASSES
-            })
-
-            // Disable assets for first pass since we need to first parse all assets for references to quasar components
+            // Delete assets for passes before this one since we need to first parse all assets for references to quasar components
             compilation.hooks.processAssets.tap({
                 name: PLUGIN_NAME,
                 stage: Compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS,
             }, () => {
-                if (passCount < CompilationPass.MODIFY_QUASAR) {
+                if (currentPass < CompilationPass.MODIFY_QUASAR) {
                     for (const asset of Object.keys(compilation.assets)) {
                         compilation.deleteAsset(asset)
                     }
@@ -186,22 +214,18 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
             // Rewrite quasar module when it gets ingested by webpack
             NormalModule.getCompilationHooks(compilation).beforeLoaders.tap(PLUGIN_NAME, (loaderItems, normalModule) => {
                 const request = normalModule.request
+
                 if (!request.includes(QUASAR_INDEX_FILE)) {
                     return
                 }
 
-                if (passCount < CompilationPass.MODIFY_QUASAR) {
+                if (currentPass < CompilationPass.MODIFY_QUASAR) {
                     return
                 }
 
-                hasModifiedQuasar = true
-
+                // Set "sideEffects" flag to false so that webpack can tree-shake unused imports
                 const packageJson = normalModule.resourceResolveData?.descriptionFileData as Record<string, unknown>
                 packageJson.sideEffects = this.#options.sideEffectsOverride
-
-                const loaderPath = path.join(__dirname, '../loader')
-                const loaderExt = existsSync(`${loaderPath}.ts`) ? 'ts' : 'js'
-                const loader = `${loaderPath}.${loaderExt}`
 
                 // Only use loader once per module
                 if (loaderItems.find((loaderItem) => loaderItem.loader === loader)) {

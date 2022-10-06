@@ -1,4 +1,4 @@
-import { Quasar } from 'quasar/src/index.all'
+import { Quasar } from 'quasar'
 import { createSSRApp } from 'vue'
 import App from './components/App.vue'
 import { createAppRouter } from './router'

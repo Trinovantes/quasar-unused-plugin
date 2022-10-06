@@ -3,7 +3,7 @@ import type { QuasarUnusedLoaderOptions } from './QuasarUnusedLoaderOptions'
 import type { LoaderContext } from 'webpack'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export function QuasarUnusedLoader(this: LoaderContext<QuasarUnusedLoaderOptions>, source: string): string {
+export default function QuasarUnusedLoader(this: LoaderContext<QuasarUnusedLoaderOptions>, source: string): string {
     const logger = this.getLogger(PLUGIN_NAME)
     const options = this.getOptions()
 
