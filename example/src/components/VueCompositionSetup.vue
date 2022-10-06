@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, defineProps, ref } from 'vue'
+import { computed, ref } from 'vue'
 import SimpleCounter from './SimpleCounter.vue'
 
 const props = defineProps({
