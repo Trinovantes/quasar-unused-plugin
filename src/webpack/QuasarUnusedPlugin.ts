@@ -144,7 +144,7 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
         })
 
         let printed = false
-        compiler.hooks.afterCompile.tap(PLUGIN_NAME, () => {
+        compiler.hooks.done.tap(PLUGIN_NAME, () => {
             if (compiler.options.target !== 'web') {
                 return
             }
