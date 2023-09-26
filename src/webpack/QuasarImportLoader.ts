@@ -1,5 +1,5 @@
 import { QUASAR_INDEX_FILE } from '../Constants'
-import type { LoaderContext } from 'webpack'
+import { LoaderContext } from 'webpack'
 
 const regex = /import\s*\{([\w,\s]+)\}\s*from\s*['"](quasar)['"]/g
 

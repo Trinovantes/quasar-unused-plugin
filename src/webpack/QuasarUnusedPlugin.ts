@@ -1,15 +1,14 @@
-import assert from 'assert'
-import { existsSync } from 'fs'
-import path from 'path'
+import { existsSync } from 'node:fs'
+import path from 'node:path'
 import quasarAutoImportJson from 'quasar/dist/transforms/auto-import.json'
 import quasarJson from 'quasar/package.json'
 import { WebpackPluginInstance, Compiler, javascript, NormalModule, Compilation } from 'webpack'
-import { PLUGIN_NAME, QUASAR_INDEX_FILE } from '../Constants'
+import { PLUGIN_NAME, QUASAR_INDEX_FILE, QUASAR_SIDE_EFFECTS } from '../Constants'
 import { findCallExpressions } from '../utils/findCallExpressions'
 import { findImportLocalId } from '../utils/findImportLocalId'
 import { QuasarUnusedPluginOptions, validateQuasarUnusedPluginOptions } from './QuasarUnusedPluginOptions'
 import { ReplaceValueDependency } from './ReplaceValueDependency'
-import type { QuasarUnusedLoaderOptions } from './QuasarUnusedLoaderOptions'
+import { QuasarUnusedLoaderOptions } from './QuasarUnusedLoaderOptions'
 
 type QuasarAutoImport = {
     importName: Record<string, string>
@@ -20,6 +19,7 @@ type QuasarAutoImport = {
 }
 
 enum CompilationPass {
+    INIT,
     FIND_COMPONENTS,
     MODIFY_QUASAR,
     NUM_PASSES,
@@ -30,10 +30,10 @@ const componentRegex = new RegExp(quasarAutoImport.regex.components)
 
 export class QuasarUnusedPlugin implements WebpackPluginInstance {
     #usedComponents = new Set<string>()
-    #options: Required<QuasarUnusedPluginOptions>
+    #options: QuasarUnusedPluginOptions
 
     constructor(options: QuasarUnusedPluginOptions = {}) {
-        assert(validateQuasarUnusedPluginOptions(options))
+        validateQuasarUnusedPluginOptions(options)
         this.#options = options
     }
 
@@ -71,8 +71,8 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
         const logger = compiler.getInfrastructureLogger(PLUGIN_NAME)
 
         const isServerBuild = (compiler.options.target === 'node')
-        const enableSsr = this.#options.enableSsr
-        const enablePwa = this.#options.enablePwa
+        const enableSsr = this.#options.enableSsr ?? false
+        const enablePwa = this.#options.enablePwa ?? false
         const replacements: Record<string, string | boolean> = {
             __QUASAR_VERSION__: quasarJson.version,
             __QUASAR_SSR__: enableSsr && isServerBuild,
@@ -168,7 +168,7 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
             NormalModule.getCompilationHooks(compilation).beforeLoaders.tap(PLUGIN_NAME, (loaderItems, normalModule) => {
                 const request = normalModule.request
                 const isJsFile = /\.[c|m]?[t|j]s$/.test(request)
-                const isVueScriptFile = /\.vue\?vue&type=script/.test(request)
+                const isVueScriptFile = request.includes('.vue?vue&type=script')
 
                 if (!isJsFile && !isVueScriptFile) {
                     return
@@ -195,7 +195,7 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
         const loader = `${loaderFile}.${loaderExt}`
 
         // Track compilation passes
-        let currentPass = -1
+        let currentPass = CompilationPass.INIT
         compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
             currentPass += 1
 
@@ -231,7 +231,7 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
 
                 // Set "sideEffects" flag to false so that webpack can tree-shake unused imports
                 const packageJson = normalModule.resourceResolveData?.descriptionFileData as Record<string, unknown>
-                packageJson.sideEffects = this.#options.sideEffectsOverride
+                packageJson.sideEffects = this.#options.sideEffectsOverride ?? QUASAR_SIDE_EFFECTS
 
                 // Only use loader once per module
                 if (loaderItems.find((loaderItem) => loaderItem.loader === loader)) {

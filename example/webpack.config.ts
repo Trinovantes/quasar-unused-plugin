@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import { VueLoaderPlugin } from 'vue-loader'
@@ -123,8 +123,9 @@ const clientEntryConfig = merge(commonConfig, {
 
     plugins: [
         new BundleAnalyzerPlugin({
-            analyzerMode: 'disabled',
-            generateStatsFile: false,
+            analyzerMode: process.env.WEBPACK_ANALYZE === 'true'
+                ? 'server'
+                : 'disabled',
         }),
         new CopyWebpackPlugin({
             patterns: [

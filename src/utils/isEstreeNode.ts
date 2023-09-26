@@ -1,4 +1,4 @@
-import type { Node } from 'estree'
+import { Node } from 'estree'
 
 export function isEstreeNode(value: unknown): value is Node {
     if (value === null || value === undefined) {

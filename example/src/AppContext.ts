@@ -1,5 +1,5 @@
-import type { SSRContext } from '@vue/server-renderer'
-import type express from 'express'
+import { SSRContext } from '@vue/server-renderer'
+import express from 'express'
 
 type QuasarSsrContext = {
     req: express.Request

@@ -1,8 +1,8 @@
-import { Dependency, javascript, Generator, sources } from 'webpack'
+import { Dependency, sources, Generator } from 'webpack'
 import { PLUGIN_NAME } from '../Constants'
+import { Expression } from 'estree'
 
-type DependencyTemplate = ReturnType<Parameters<Generator['generate']>[1]['dependencyTemplates']['get']>
-type Expression = Parameters<javascript.JavascriptParser['evaluateExpression']>[0]
+type DependencyTemplate = Exclude<ReturnType<Parameters<Generator['generate']>[1]['dependencyTemplates']['get']>, undefined>
 
 export class ReplaceValueDependency extends Dependency {
     #exprNode: Expression

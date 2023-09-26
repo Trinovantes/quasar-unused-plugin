@@ -1,5 +1,5 @@
 import { visitChildren } from './visitChildren'
-import type { CallExpression, Node } from 'estree'
+import { CallExpression, Node } from 'estree'
 
 export function findCallExpressions(root: Node, calleeName: string): Array<CallExpression> {
     const isTargetCallExpression = (node: Node): node is CallExpression => {

@@ -1,5 +1,5 @@
 import { isEstreeNode } from './isEstreeNode'
-import type { Node } from 'estree'
+import { Node } from 'estree'
 
 export function stringifyEstree(root: Node): string {
     let str = ''

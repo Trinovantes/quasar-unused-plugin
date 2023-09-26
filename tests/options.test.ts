@@ -1,12 +1,11 @@
-import { QUASAR_SIDE_EFFECTS } from '@/Constants'
 import { QuasarUnusedPluginOptions, validateQuasarUnusedPluginOptions } from '@/webpack/QuasarUnusedPluginOptions'
+import { describe, test, expect } from 'vitest'
 
 describe('QuasarUnusedPluginOptions', () => {
     test('no options', () => {
         const options: QuasarUnusedPluginOptions = {}
 
         expect(validateQuasarUnusedPluginOptions(options)).toBe(true)
-        expect(options.sideEffectsOverride).toStrictEqual(QUASAR_SIDE_EFFECTS)
     })
 
     test('Array<string> sideEffects', () => {
