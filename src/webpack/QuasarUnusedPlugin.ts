@@ -33,7 +33,7 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
         const enablePwa = this.#options.enablePwa ?? false
         const replacements: Record<string, string | boolean> = {
             __QUASAR_VERSION__: quasarJson.version,
-            __QUASAR_SSR__: enableSsr && isServerBuild,
+            __QUASAR_SSR__: enableSsr,
             __QUASAR_SSR_SERVER__: enableSsr && isServerBuild,
             __QUASAR_SSR_CLIENT__: enableSsr && !isServerBuild,
             __QUASAR_SSR_PWA__: enableSsr && enablePwa,
