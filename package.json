@@ -1,6 +1,6 @@
 {
     "name": "quasar-unused-plugin",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "description": "Webpack 5 plugin for tree shaking unused Quasar components from generated bundles",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
