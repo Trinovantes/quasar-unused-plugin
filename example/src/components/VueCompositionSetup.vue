@@ -34,7 +34,7 @@ const message = ref<string | null>(null)
                     debounce="250"
                     outlined
                     clearable
-                    :rules="[ (val: string) => val && val.length > 0 || 'Message cannot be empty']"
+                    :rules="[ (val: string) => val && val.length > 0 || 'Message cannot be empty' ]"
                     hide-bottom-space
                 />
             </q-form>

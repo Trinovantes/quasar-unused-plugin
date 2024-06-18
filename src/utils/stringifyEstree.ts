@@ -1,6 +1,18 @@
 import { isEstreeNode } from './isEstreeNode'
 import { Node } from 'estree'
 
+const hiddenNodeKeys = [
+    'loc',
+    'range',
+    'leadingComments',
+    'trailingComments',
+    'type',
+
+    'start',
+    'end',
+    'value',
+]
+
 export function stringifyEstree(root: Node): string {
     let str = ''
 
@@ -68,15 +80,3 @@ export function stringifyEstree(root: Node): string {
     stringify(root)
     return str
 }
-
-const hiddenNodeKeys = [
-    'loc',
-    'range',
-    'leadingComments',
-    'trailingComments',
-    'type',
-
-    'start',
-    'end',
-    'value',
-]

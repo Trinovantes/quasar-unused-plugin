@@ -16,7 +16,7 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
 
     apply(compiler: Compiler) {
         this.#replaceQuasarMacros(compiler)
-        this.#rewriteQuasarIndex(compiler)
+        this.#rewriteQuasarPackageSideEffects(compiler)
         this.#rewriteQuasarImportForScripts(compiler)
         this.#rewriteQuasarImportForComponents(compiler)
     }
@@ -124,17 +124,12 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
         })
     }
 
-    #rewriteQuasarIndex(compiler: Compiler) {
-        const loaderFile = path.join(__dirname, 'loaders', 'TransformQuasarIndex')
-        const loaderExt = existsSync(`${loaderFile}.ts`) ? 'ts' : 'js'
-        const loader = `${loaderFile}.${loaderExt}`
-
+    #rewriteQuasarPackageSideEffects(compiler: Compiler) {
         compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
             // Rewrite quasar module when it gets ingested by webpack
             NormalModule.getCompilationHooks(compilation).beforeLoaders.tap(PLUGIN_NAME, (loaderItems, normalModule) => {
                 const request = normalModule.request
                 const isQuasarIndexFile = request.includes(QUASAR_INDEX_FILE)
-
                 if (!(isQuasarIndexFile)) {
                     return
                 }
@@ -142,18 +137,6 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
                 // Set "sideEffects" flag to false so that webpack can tree shake unused imports
                 const packageJson = normalModule.resourceResolveData?.descriptionFileData as Record<string, unknown>
                 packageJson.sideEffects = this.#options.sideEffectsOverride ?? QUASAR_SIDE_EFFECTS
-
-                // Only use loader once per module
-                if (loaderItems.find((loaderItem) => loaderItem.loader === loader)) {
-                    return
-                }
-
-                loaderItems.push({
-                    loader,
-                    options: null,
-                    ident: null,
-                    type: null,
-                })
             })
         })
     }

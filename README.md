@@ -1,6 +1,9 @@
 # Quasar Unused Plugin
 
-This is a Webpack 5 plugin for tree shaking unused Quasar components from generated bundles. If you are using Quasar as a standalone UI library with Webpack, then you will be importing from `node_modules/quasar/dist/quasar.esm.prod.js`. However, Webpack cannot tree shake unused components from this file because this file contains circular references. We can instead import the source code from `quasar/src/index.prod.js` and use this plugin to break the dependency chain.
+This is a Webpack 5 plugin for tree shaking unused Quasar components from generated bundles.
+If you are using Quasar as a standalone UI library with Webpack, then you will be importing from `node_modules/quasar/dist/quasar.esm.prod.js`.
+However, Webpack cannot tree shake unused components from this file because this file contains circular references.
+We can instead import the source code from `quasar/src/index.prod.js` and use this plugin to break the dependency chain.
 
 ## Example Savings (in `./examples` dir)
 
@@ -21,7 +24,7 @@ export default {
 }
 ```
 
-If you are externalizing node modules, you need to allowlist `quasar` so that Webpack can process this package.
+If you are externalizing node modules, you need to add `quasar` to the allowlist so that Webpack can process this package.
 
 ```ts
 import nodeExternals from 'webpack-node-externals'
