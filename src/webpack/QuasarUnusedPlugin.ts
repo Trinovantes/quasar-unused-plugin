@@ -111,8 +111,8 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
 
                 // Inject loader after <template> has been processed by vue-loader
                 const insertLoaderIdx = isScriptSetup
-                    ? loaderItems.findIndex((loaderItem) => loaderItem.loader.includes('vue-loader/dist/index.js')) // Inject into <script> after it gets processed by vue-loader
-                    : loaderItems.findIndex((loaderItem) => loaderItem.loader.includes('vue-loader/dist/templateLoader.js')) // Inject into ssrRender after <template> is processed by vue-loader
+                    ? loaderItems.findIndex((loaderItem) => /vue-loader[\\/]dist[\\/]index\.js/.test(loaderItem.loader)) // Inject into <script> after it gets processed by vue-loader
+                    : loaderItems.findIndex((loaderItem) => /vue-loader[\\/]dist[\\/]templateLoader\.js/.test(loaderItem.loader)) // Inject into ssrRender after <template> is processed by vue-loader
 
                 loaderItems.splice(insertLoaderIdx, 0, {
                     loader,
