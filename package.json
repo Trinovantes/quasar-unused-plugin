@@ -40,6 +40,7 @@
         "webpack": "^5.28.0"
     },
     "devDependencies": {
+        "@eslint/compat": "^1.1.0",
         "@eslint/js": "^9.4.0",
         "@stylistic/eslint-plugin": "^2.1.0",
         "@types/eslint__js": "^8.42.3",
