@@ -5,7 +5,7 @@ export function findImportLocalId(root: Node, importSource: string, importName: 
     const search = (node: Node): ImportSpecifier | ImportDefaultSpecifier | undefined => {
         if (node.type === 'ImportDeclaration' && node.source.value === importSource) {
             for (const specifier of node.specifiers) {
-                if (specifier.type === 'ImportSpecifier' && specifier.imported.name === importName) {
+                if (specifier.type === 'ImportSpecifier' && specifier.imported.type === 'Identifier' && specifier.imported.name === importName) {
                     return specifier
                 }
 
