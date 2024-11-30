@@ -30,10 +30,11 @@
         "exBuild": "NODE_ENV=production  webpack         --config example/webpack.config.ts",
         "exWatch": "NODE_ENV=development nodemon -r source-map-support/register dist/example/www.js --watch dist/example",
         "exStart": "NODE_ENV=production  node    -r source-map-support/register dist/example/www.js",
-        "exAnalyze": "WEBPACK_ANALYZE=true NODE_ENV=production webpack --config example/webpack.config.ts"
+        "exAnalyze": "WEBPACK_ANALYZE=true NODE_ENV=production webpack --config example/webpack.config.ts",
+        "prepare": "patch-package"
     },
     "dependencies": {
-        "@sinclair/typebox": "^0.32.12"
+        "@sinclair/typebox": "^0.34.9"
     },
     "peerDependencies": {
         "quasar": ">= 2.16 && < 3",
@@ -47,7 +48,7 @@
         "@types/estree": "^1.0.0",
         "@types/express": "^4.17.11",
         "@types/jsdom": "^21.1.0",
-        "@types/node": "^20.7.0",
+        "@types/node": "^22.10.0",
         "@types/webpack": "^5.28.0",
         "@types/webpack-bundle-analyzer": "^4.4.1",
         "copy-webpack-plugin": "^12.0.2",
@@ -59,6 +60,7 @@
         "express": "^4.17.3",
         "mini-css-extract-plugin": "^2.6.0",
         "null-loader": "^4.0.1",
+        "patch-package": "^8.0.0",
         "quasar": "^2.11.5",
         "sass": "^1.50.0",
         "sass-loader": "^16.0.2",
@@ -67,7 +69,7 @@
         "ts-node": "^10.9.2",
         "typescript": "^5.0.2",
         "typescript-eslint": "^8.0.0-alpha.30",
-        "vitest": "^1.2.1",
+        "vitest": "^2.1.6",
         "vue": "^3.2.33",
         "vue-loader": "^17.0.0",
         "vue-router": "^4.0.14",
