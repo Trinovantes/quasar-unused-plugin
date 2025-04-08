@@ -135,7 +135,7 @@ export class QuasarUnusedPlugin implements WebpackPluginInstance {
                 }
 
                 // Set "sideEffects" flag to false so that webpack can tree shake unused imports
-                const packageJson = normalModule.resourceResolveData?.descriptionFileData as Record<string, unknown>
+                const packageJson = (normalModule.resourceResolveData as Record<string, Record<string, unknown>>)?.descriptionFileData
                 packageJson.sideEffects = this.#options.sideEffectsOverride ?? QUASAR_SIDE_EFFECTS
             })
         })
