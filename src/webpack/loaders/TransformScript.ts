@@ -20,9 +20,15 @@ export default function(this: LoaderContext<unknown>, source: string) {
                 // It's possible to have an empty item
                 // e.g. import { QBtn, } from 'quasar'
                 //                   ^
-
                 const originalImport = item.at(0)?.trim()
                 if (!originalImport) {
+                    return ''
+                }
+
+                // Ignore type imports
+                // e.g. import { type QBtn } from 'quasar'
+                //               ^
+                if (originalImport.startsWith('type ')) {
                     return ''
                 }
 
