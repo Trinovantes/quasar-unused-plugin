@@ -1,5 +1,5 @@
-import { QuasarUnusedPluginOptions, validateQuasarUnusedPluginOptions } from '@/webpack/QuasarUnusedPluginOptions'
 import { describe, test, expect } from 'vitest'
+import { QuasarUnusedPluginOptions, validateQuasarUnusedPluginOptions } from '../src/index'
 
 describe('QuasarUnusedPluginOptions', () => {
     test('no options', () => {

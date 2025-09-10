@@ -24,20 +24,19 @@
         "dev": "  NODE_ENV=development tsc -p tsconfig.prod.json --watch",
         "build": "NODE_ENV=production  tsc -p tsconfig.prod.json",
         "prepublishOnly": "rm -rf ./dist && yarn build",
-        "lint": "vue-tsc --noemit && eslint",
+        "lint": "vue-tsc && eslint",
         "test": "vitest",
         "exDev": "  NODE_ENV=development webpack --watch --config example/webpack.config.ts",
         "exBuild": "NODE_ENV=production  webpack         --config example/webpack.config.ts",
         "exWatch": "NODE_ENV=development nodemon -r source-map-support/register dist/example/www.js --watch dist/example",
         "exStart": "NODE_ENV=production  node    -r source-map-support/register dist/example/www.js",
-        "exAnalyze": "WEBPACK_ANALYZE=true NODE_ENV=production webpack --config example/webpack.config.ts",
-        "prepare": "patch-package"
+        "exAnalyze": "WEBPACK_ANALYZE=true NODE_ENV=production webpack --config example/webpack.config.ts"
     },
     "dependencies": {
         "@sinclair/typebox": "^0.34.9"
     },
     "peerDependencies": {
-        "quasar": ">= 2.16 && < 3",
+        "quasar": ">= 2.16",
         "webpack": "^5.28.0"
     },
     "devDependencies": {
@@ -50,6 +49,7 @@
         "@types/node": "^22.10.0",
         "@types/webpack": "^5.28.0",
         "@types/webpack-bundle-analyzer": "^4.4.1",
+        "@vue/server-renderer": "^3.5.21",
         "copy-webpack-plugin": "^13.0.0",
         "css-loader": "^7.1.2",
         "esbuild-loader": "^4.0.2",
@@ -57,9 +57,9 @@
         "eslint-plugin-n": "^17.7.0",
         "eslint-plugin-vue": "^10.0.0",
         "express": "^4.17.3",
+        "globals": "^16.4.0",
         "mini-css-extract-plugin": "^2.6.0",
         "null-loader": "^4.0.1",
-        "patch-package": "^8.0.0",
         "quasar": "^2.11.5",
         "sass": "^1.50.0",
         "sass-loader": "^16.0.2",
@@ -74,7 +74,7 @@
         "vue-loader": "^17.0.0",
         "vue-router": "^4.0.14",
         "vue-ssr-assets-plugin": "^0.4.0",
-        "vue-tsc": "^2.0.7",
+        "vue-tsc": "^3.0.6",
         "webpack": "^5.72.0",
         "webpack-bundle-analyzer": "^4.5.0",
         "webpack-cli": "^6.0.1",
