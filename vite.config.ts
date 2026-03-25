@@ -25,6 +25,12 @@ export default defineConfig({
                 ...Object.keys(pkg.dependencies),
                 ...Object.keys(pkg.peerDependencies),
             ],
+            output: {
+                preserveModules: true,
+                preserveModulesRoot: 'src',
+                entryFileNames: '[name].js',
+                dir: 'dist',
+            },
         },
     },
 
