@@ -2,7 +2,7 @@
 import SimpleCounter from './SimpleCounter.vue'
 import { QBtn } from 'quasar'
 
-const onIntersect = () => {
+const onIntersect = (): false | undefined => {
     // Use the variable so it doesn't get tree shaked
     console.info(QBtn)
     return false // Stop observer after first intersection
